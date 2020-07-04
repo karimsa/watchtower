@@ -1,0 +1,14 @@
+name: CI
+
+on: [push, pull_request]
+
+env:
+  CI: true
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build image
+      run: docker build -t karimsa/watchtower .
