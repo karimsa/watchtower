@@ -4,6 +4,7 @@ on: [push, pull_request]
 
 env:
   CI: true
+  DOCKER_AUTH: ${{ secrets.DOCKER_AUTH }}
 
 jobs:
   build:
@@ -12,3 +13,15 @@ jobs:
     - uses: actions/checkout@v1
     - name: Build image
       run: docker build -t karimsa/watchtower .
+    - name: docker login
+      if: github.ref == 'master' || startsWith(github.ref, 'refs/tags/v')
+      run: |
+        mkdir -p ~/.docker
+        echo '{"auths":{"https://index.docker.io/v1/":{"auth":"$DOCKER_AUTH"}}}' > ~/.docker/config.json
+    - name: docker push karimsa/watchtower:unstable
+      if: github.ref == 'master'
+      run: |
+        docker tag karimsa/watchtower karimsa/watchtower:unstable
+        docker push karimsa/watchtower:unstable
+    - if: startsWith(github.ref, 'refs/tags/v')
+      run: docker push karimsa/watchtower
