@@ -64,6 +64,11 @@ func (wt *watchtower) loadDockerConfig() error {
 
 	wt.registryAuth = make(map[string]string, len(config.Auths))
 	for registry, opts := range config.Auths {
+		if strings.HasPrefix(registry, "https://index.docker.io/") {
+			registry = "index.docker.io"
+		}
+
+		log.Printf("Loaded stored auth for: %s", registry)
 		wt.registryAuth[registry] = opts.Auth
 	}
 	return nil
@@ -111,10 +116,9 @@ func (wt *watchtower) pullImage(auth, image string) error {
 
 func (wt *watchtower) getContainerImageName(name string, container dockerTypes.Container) (string, string, error) {
 	image := container.Image
-	registry := "hub.docker.com"
+	registry := "index.docker.io"
 
 	if strings.HasPrefix(image, "sha256:") {
-		// func (cli *Client) ImageInspectWithRaw(ctx context.Context, imageID string) (types.ImageInspect, []byte, error)
 		imageDetails, _, err := wt.docker.ImageInspectWithRaw(context.Background(), image)
 		if err != nil {
 			return image, registry, fmt.Errorf("Failed to inspect image %s\n\t%s", image[:7+6], err.Error())
