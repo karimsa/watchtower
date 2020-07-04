@@ -1,0 +1,6 @@
+all: watchtower
+
+watchtower:
+	go fmt ./...
+	go vet ./...
+	go build -o watchtower main.go
