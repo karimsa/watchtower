@@ -1,3 +1,4 @@
+## Builder
 FROM golang:1.13-alpine AS builder
 
 RUN apk add make build-base
@@ -7,10 +8,17 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 
-COPY main.go main.go
+COPY rebuild.go rebuild.go
 RUN go vet ./... \
-		&& go build -o watchtower main.go
+		&& go build -o rebuild_container rebuild.go
 
+## Final image
 FROM alpine
-COPY --from=builder /app/watchtower /usr/local/bin/watchtower
+
+RUN apk add --no-cache bash jq docker-cli
+
+COPY --from=builder /app/rebuild_container /usr/local/bin/rebuild_container
+COPY watchtower.sh /usr/local/bin/watchtower
+RUN chmod +x /usr/local/bin/watchtower
+
 CMD /usr/local/bin/watchtower
