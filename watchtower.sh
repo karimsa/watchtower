@@ -26,7 +26,7 @@ function erase_end_line() {
 		# Max width of lines should be 103, given that we trim
 		# long lines at 100 and then add an ellipsis
 		echo -en "\r"
-		for ((i=0;i<104;i++)); do
+		for ((x=0;x<104;x++)); do
 			echo -en " "
 		done
 		echo -en "\r"
