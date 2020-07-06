@@ -1,7 +1,7 @@
 ## Builder
 FROM golang:1.13-alpine AS builder
 
-RUN apk add make build-base
+RUN apk add --no-cache make build-base
 
 WORKDIR /app
 
@@ -21,4 +21,4 @@ COPY --from=builder /app/rebuild_container /usr/local/bin/rebuild_container
 COPY watchtower.sh /usr/local/bin/watchtower
 RUN chmod +x /usr/local/bin/watchtower
 
-CMD /usr/local/bin/watchtower
+ENTRYPOINT ["/usr/local/bin/watchtower"]
