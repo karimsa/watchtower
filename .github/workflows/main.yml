@@ -23,5 +23,12 @@ jobs:
       run: |
         docker tag karimsa/watchtower karimsa/watchtower:unstable
         docker push karimsa/watchtower:unstable
-    - if: startsWith(github.ref, 'refs/tags/v')
-      run: docker push karimsa/watchtower:latest
+    - uses: meeDamian/sync-readme@v1.0.6
+      if: startsWith(github.ref, 'refs/tags/v')
+      with:
+        user: karimsa
+        pass: ${{ secrets.DOCKER_PASS }}
+        slug: karimsa/watchtower
+        readme: README.md
+    - run: docker push karimsa/watchtower:latest
+      if: startsWith(github.ref, 'refs/tags/v')
