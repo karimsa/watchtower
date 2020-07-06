@@ -30,5 +30,8 @@ jobs:
         pass: ${{ secrets.DOCKER_PASS }}
         slug: karimsa/watchtower
         readme: README.md
-    - run: docker push karimsa/watchtower:latest
-      if: startsWith(github.ref, 'refs/tags/v')
+    - if: startsWith(github.ref, 'refs/tags/v')
+      run: |
+        set -ex
+        docker tag karimsa/watchtower karimsa/watchtower:${GITHUB_REF#*/*/v}
+        docker push karimsa/watchtower:latest
