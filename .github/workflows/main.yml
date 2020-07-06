@@ -18,7 +18,7 @@ jobs:
       run: |
         mkdir -p ~/.docker
         echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$DOCKER_AUTH\"}}}" > ~/.docker/config.json
-    - name: docker push karimsa/watchtower:unstable
+    - name: Release unstable
       if: github.ref == 'refs/heads/master'
       run: |
         docker tag karimsa/watchtower karimsa/watchtower:unstable
@@ -30,7 +30,8 @@ jobs:
         pass: ${{ secrets.DOCKER_PASS }}
         slug: karimsa/watchtower
         readme: README.md
-    - if: startsWith(github.ref, 'refs/tags/v')
+    - name: Release stable
+      if: startsWith(github.ref, 'refs/tags/v')
       run: |
         set -ex
         docker tag karimsa/watchtower karimsa/watchtower:${GITHUB_REF#*/*/v}
