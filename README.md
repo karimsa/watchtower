@@ -45,8 +45,8 @@ To see the full list of options, simply run watchtower with the `--help` flag.
 
 *In these examples, we assume the alias: `alias watchtower="docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock:ro karimsa/watchtower watchtower"`*
 
-**Ensure that the 'jpillora/dnsmasq' containers are up-to-date**: `watchtower --image 'jpillora/dnsmasq'`
-**Update 'jpillora/dnsmasq' containers every 60 seconds**: `watchtower --image jpillora/dnsmasq --interval 60`
+  * **Ensure that the 'jpillora/dnsmasq' containers are up-to-date**: `watchtower --image 'jpillora/dnsmasq'`
+  * **Update 'jpillora/dnsmasq' containers every 60 seconds**: `watchtower --image jpillora/dnsmasq --interval 60`
 
 ## License
 
