@@ -19,11 +19,19 @@ function show_usage() {
 	exit 1
 }
 
-if ! which tput &>/dev/null; then
-	function tput() {
-		:
-	}
-fi
+function erase_end_line() {
+	if which tput &>/dev/null; then
+		tput el
+	else
+		# Max width of lines should be 103, given that we trim
+		# long lines at 100 and then add an ellipsis
+		echo -en "\r"
+		for ((i=0;i<104;i++)); do
+			echo -en " "
+		done
+		echo -en "\r"
+	fi
+}
 
 interval=""
 imageFilter=".*"
@@ -97,7 +105,7 @@ while :; do
 				preUpdateImage=`docker images --format '{{.ID}}' $imageName`
 				docker pull $imageName | tee test.log | while read stdout; do
 					echo -en "\r"
-					tput el
+					erase_end_line
 
 					output="$imageName - $stdout"
 					echo -en "${output:0:100}"
@@ -107,7 +115,7 @@ while :; do
 				done
 
 				echo -en "\r"
-				tput el
+				erase_end_line
 
 				imageID=`docker images --format '{{.ID}}' $imageName`
 				if test "$imageID" = "$preUpdateImage"; then
@@ -137,10 +145,10 @@ while :; do
 	echo "---------------------------"
 	for ((i=0;i<$interval;i++)); do
 		echo -en "\r"
-		tput el
+		erase_end_line
 		echo -en "Next update in $[$interval-$i]s"
 		sleep 1
 	done
 	echo -en "\r"
-	tput el
+	erase_end_line
 done
