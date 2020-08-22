@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+set -o pipefail
 
 export PATH="$PATH:`dirname $0`"
 
@@ -32,6 +33,10 @@ function erase_end_line() {
 		echo -en "\r"
 	fi
 }
+
+if test -e "`dirname $0`/rebuild_container"; then
+	alias rebuild_container="`dirname $0`/rebuild_container"
+fi
 
 interval=""
 imageFilter=".*"
@@ -125,13 +130,20 @@ while :; do
 					numUpdatedImages="$[1+$numUpdatedImages]"
 				fi
 
-				if test "${containerImageID:0:${#imageID}}" != "$imageID"; then
-					log "Container out-of-date: $containerID (running ${containerImageID:0:${#imageID}}, expected $imageID)"
+				visitedImages="${visitedImages}${imageName}|"
+			fi
+
+			imageID=`docker images --format '{{.ID}}' $imageName`
+			if test "${containerImageID:0:${#imageID}}" != "$imageID"; then
+				log "Container out-of-date: $containerID (running ${containerImageID:0:${#imageID}}, expected $imageID)"
+
+				if echo "$imageName" | grep "karimsa/watchtower" &>/dev/null; then
+					log "Restarted $containerID as `rebuild_container --allow-dup "$containerID"`"
+				else
 					log "Restarted $containerID as `rebuild_container "$containerID"`"
-					numUpdatedContainers="$[1+$numUpdatedContainers]"
 				fi
 
-				visitedImages="${visitedImages}${imageName}|"
+				numUpdatedContainers="$[1+$numUpdatedContainers]"
 			fi
 		fi
 	done
