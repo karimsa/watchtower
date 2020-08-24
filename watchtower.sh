@@ -16,6 +16,7 @@ function show_usage() {
 	echo -e "	-h, --help	print this help message"
 	echo -e "	-i, --interval [number]	continuously runs update cycles, with [number] seconds in between"
 	echo -e "	-I, --image [pattern]	filters checked images to ones matching [pattern]"
+	echo -e "	-p, --prune	prune images after successful updates"
 	echo -e ""
 	exit 1
 }
@@ -40,6 +41,7 @@ fi
 
 interval=""
 imageFilter=".*"
+pruneImages="false"
 while test "$#" -gt "0"; do
 	case "$1" in
 		-h|--help)
@@ -65,6 +67,11 @@ while test "$#" -gt "0"; do
 				echo "Error: Invalid regex passed for --image"
 				show_usage
 			fi
+			;;
+
+		-p|--prune)
+			shift
+			pruneImages="true"
 			;;
 
 		-*)
@@ -149,6 +156,10 @@ while :; do
 	done
 
 	log "Updated $numUpdatedContainers containers & $numUpdatedImages images."
+
+	if test "$numUpdatedContainers" -gt "0" && test "$pruneImages" = "true"; then
+		docker images prune -a
+	fi
 
 	if test -z "$interval"; then
 		exit
